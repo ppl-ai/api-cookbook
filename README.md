@@ -22,7 +22,9 @@ Please check the [CONTRIBUTING.md](./CONTRIBUTING.md) file for guidelines.
 
 • **[Daily Knowledge Bot](sonar-use-cases/daily_knowledge_bot/)** - Python application that delivers interesting facts about rotating topics using the Perplexity AI API.
 
-• **[Disease Information App](sonar-use-cases/daily_knowledge_bot/)** - Interactive browser-based application providing structured information about diseases using the Sonar API.
+• **[Disease Information App](sonar-use-cases/disease_qa/)** - Interactive browser-based application providing structured information about diseases using the Sonar API.
+
+• **[Academic Research Finder CLI](sonar-use-cases/research_finder/)** - A command-line tool for finding and summarizing academic research papers and articles using Perplexity Sonar API.
 
 ## Getting Started
 
@@ -37,4 +39,3 @@ Each project includes its own README with specific installation and usage instru
 ## License
 
 Unless otherwise specified, all projects in this repository are licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
-
