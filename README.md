@@ -24,6 +24,8 @@ Please check the [CONTRIBUTING.md](./CONTRIBUTING.md) file for guidelines.
 
 • **[Disease Information App](sonar-use-cases/daily_knowledge_bot/)** - Interactive browser-based application providing structured information about diseases using the Sonar API.
 
+• **[OSINT Assistant](https://github.com/AXRoux/OSINT-Assistant)** - Web app and command line interface tool for gathering, analyzing, and reporting on information from various web sources.
+
 ## Getting Started
 
 To use any of the projects in this repository, you'll need:
