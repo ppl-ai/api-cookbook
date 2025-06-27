@@ -17,7 +17,7 @@ A command-line tool that identifies false or misleading claims in articles or st
 
 ```bash
 # Ensure you are using the same pip associated with the python3 you intend to run the script with
-pip install requests pydantic newspaper3k
+pip install requests pydantic newspaper3k lxml-html-clean
 ```
 
 ### 2. Make the script executable
