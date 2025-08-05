@@ -1,0 +1,85 @@
+---
+title: FirstPrinciples App | AI-Powered Learning Roadmaps 
+description: An AI-powered learning roadmap generator that helps users identify specific learning topics and provides personalized learning plans. 
+sidebar_position: 1 
+keywords: [firstprinciples, learning, roadmap, education, AI, personalized, Flask, React, OpenAI, Perplexity]
+---
+
+**FirstPrinciples App** is an AI-powered tool that transforms your broad learning goals into structured, personalized roadmaps. Through an interactive chat, the AI engages you in a conversation, asking targeted questions to refine your learning needs before generating a detailed plan. The application is built to help you learn more efficiently by providing a clear path forward.
+
+https://github.com/user-attachments/assets/6016c5dd-6c18-415e-b982-fafb56170b87
+
+## Features
+
+  * **Interactive Chat Interface**: A simple, conversational interface for defining your learning goals.
+  * **AI-Powered Topic Narrowing**: The AI asks smart, targeted questions to help you specify what you want to learn.
+  * **Session Management**: Each conversation is a managed session, allowing you to have multiple roadmap discussions.
+  * **Visual Progress Indicator**: See a visual cue when the AI has gathered enough information to generate your roadmap.
+
+## Setup
+
+### Getting Started
+
+To get the project files, first clone the repository:
+
+```
+git clone https://github.com/william-Dic/First-Principle.git
+cd First-Principle
+```
+
+-----
+
+### Backend Setup
+
+1.  Navigate to the Flask server directory:
+    ```
+    cd flask-server
+    ```
+2.  Install dependencies:
+    ```
+    pip install -r requirements.txt
+    ```
+3.  Create a `.env` file in the `flask-server` directory with your API keys:
+    ```
+    OPENAI_API_KEY = Your_openai_apikey
+    PPLX_API_KEY = Your_perplexity_apikey
+    PERPLEXITY_API_KEY = Your_perplexity_apikey
+    ```
+4.  Run the Flask server:
+    ```
+    python server.py
+    ```
+    The server will run on http://localhost:5000.
+
+-----
+
+### Frontend Setup
+
+1.  Navigate to the client directory:
+    ```
+    cd client
+    ```
+2.  Install dependencies:
+    ```
+    npm install
+    ```
+3.  Run the React development server:
+    ```
+    npm start
+    ```
+    The client will run on http://localhost:3000.
+
+## Usage
+
+1.  Open your browser and go to `http://localhost:3000`.
+2.  Use the chat interface to describe what you want to learn.
+3.  Answer the AI's follow-up questions to help it narrow down your specific needs.
+4.  Once the AI has sufficient information, it will generate your personalized learning roadmap.
+
+-----
+
+## Tech Stack
+
+  * **Frontend**: React
+  * **Backend**: Flask, Python
+  * **AI Engine**: OpenAI API, Perplexity API
