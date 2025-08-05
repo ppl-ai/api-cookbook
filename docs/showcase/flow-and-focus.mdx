@@ -1,0 +1,70 @@
+---
+title: Flow & Focus | Personalized News for Genuine Understanding
+description: Dual-mode news app combining vertical feed discovery with AI-powered deep dives using Perplexity Sonar
+sidebar_position: 6
+keywords: [Flow & Focus, Perplexity Hackathon, news personalization, Sonar Pro, Sonar Deep Research, Next.js, React]
+---
+
+# Flow & Focus | Personalized News for Genuine Understanding
+
+**Flow & Focus** reclaims your curiosity by transforming news consumption into a personalized learning experience. It uniquely combines the rapid discovery of a vertical news feed (Flow) with in-depth, interactive learning dialogues (Focus), powered by Perplexity's Sonar Pro and Sonar Deep Research models.
+
+## Features
+
+* **Dual Mode Interface**: Flow Feed for quick news discovery and Focus for personalized deep dives
+* **Vertical News Feed**: Swipeable news snippets with AI-generated summaries, tags, and background images
+* **Interactive Deep Dives**: Tap key phrases for focused content, with horizontally scrollable detail panes
+* **Personalized Learning**: AI-powered conversation segments with personas like "Oracle" and "Explorer"
+* **Smart Personalization**: Tracks reading patterns to tailor content selection automatically
+* **Real-time Content**: Leverages Sonar Pro for up-to-date news and Sonar Deep Research for detailed analysis
+* **Visual Enhancement**: Dynamic background images generated via Runware.ai based on content keywords
+
+## Demo
+
+[![Flow & Focus Demo](https://img.youtube.com/vi/09h7zluuhQI/0.jpg)](https://www.youtube.com/watch?v=09h7zluuhQI)
+
+
+## Prerequisites
+
+* Node.js 18+ and npm
+* Perplexity API key
+* Runware API key for image generation
+* Next.js 15 and React 19 environment
+
+## Installation
+
+```bash
+git clone https://github.com/michitomo/NewsReel.git
+cd NewsReel
+npm install
+
+# Create .env.local with your API keys
+echo "PERPLEXITY_API_KEY=your_perplexity_api_key_here" > .env.local
+echo "RUNWARE_API_KEY=your_runware_api_key_here" >> .env.local
+echo "PERPLEXITY_FOCUS_MODEL=sonar-deep-research" >> .env.local
+
+# Start development server
+npm run dev
+```
+
+## Architecture
+
+* **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS, Framer Motion
+* **State Management**: Zustand with localStorage persistence
+* **LLM Integration**: Perplexity Sonar Pro (real-time news) and Sonar Deep Research (in-depth analysis)
+* **Image Generation**: Runware SDK with keyword-based prompting
+* **API Routes**: Server-side integration with Perplexity and Runware APIs
+
+## Usage
+
+1. **Flow Feed**: Scroll vertically through news snippets, tap key phrases for deep dives
+2. **Focus Mode**: Generate personalized digests with interactive conversation segments
+3. **Personalization**: Your viewing patterns automatically influence content selection
+4. **Navigation**: Swipe gestures for intuitive mobile-first experience
+
+## Links
+
+* [GitHub Repository](https://github.com/michitomo/NewsReel)
+* [Demo Video](https://www.youtube.com/watch?v=09h7zluuhQI)
+* [Perplexity Hackathon](https://perplexityhackathon.devpost.com/)
+* [Perplexity Hackathon Project](https://devpost.com/software/flow-focus)
