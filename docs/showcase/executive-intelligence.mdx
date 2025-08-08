@@ -1,0 +1,329 @@
+---
+title: Executive Intelligence
+description: Competitor intelligence, market info, risk analysis, and benchmark. Imagine you’re a CEO, and you need to know these —instantly and reliably.
+sidebar_position: 6
+keywords: [Executive Intelligence, Next.js AI Application, Perplexity Sonar API, Competitive Intelligence, React TypeScript AI]
+---
+# Executive Intelligence
+Executive Intelligence is a Perplexity Sonar powered application designed to provide executives and board members with instant, accurate, and credible intelligence for strategic decision-making.
+Recognizing the challenges of sifting through vast amounts of information quickly and reliably, this project focuses on delivering board-ready insights derived from real-time data sources, powered by Perplexity's Sonar API.
+*Built by [Raish Shrestha](https://www.linkedin.com/in/raishs/)*
+
+## Features
+
+- **Competitive Intelligence Briefs**: Generate comprehensive, board-ready competitive analysis for any company. Provides executive summaries, recent competitor moves, market shifts, recommendations, and full, verifiable citations for every claim.
+- **Scenario Planning (“What If?” Analysis)**: Dynamically generate and analyze potential future scenarios based on real-time competitor and industry data. Get structured, cited reports exploring risks, opportunities, and recommendations for hypothetical situations.
+- **Board Pack Memory**: Save and organize key intelligence briefs, scenario analyses, and benchmark reports. Create a persistent, searchable knowledge base accessible in a dedicated Board Pack section.
+- **Instant Benchmarking & Peer Comparison**: Quickly generate source-cited, visual comparisons of your company against top competitors across critical metrics. Data points are linked to their sources, providing reliable support for strategic discussions.
+
+## Prerequisites
+
+*   Node.js (v18 or later recommended)
+*   npm or yarn
+*   Git
+*   A Perplexity API key
+
+## Installation
+
+1.  Clone the repository:
+    ```bash
+    git clone [Your GitHub Repo URL]
+    cd [Your Repo Name]
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+3.  Set up environment variables:
+    Create a `.env.local` file in the root of the project.
+    ```env
+    PERPLEXITY_API_KEY=YOUR_PERPLEXITY_API_KEY
+    ```
+    Replace `YOUR_PERPLEXITY_API_KEY` with your actual Perplexity API key.
+
+4.  Run the development server:
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    ```
+5.  Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+## Usage
+
+*   **Company Input:** Enter the company you want to analyze in the input field at the top.
+*   **Boardroom Intelligence:** Click the buttons within the "Executive Intelligence" card to generate Competitive Analysis Briefs, explore Scenario Planning, or view the Instant Benchmarking board.
+*   **Save to Board Pack:** Use the "Save to Board Pack" button within the modals to store generated reports for later access.
+*   **Board Pack:** Click the "📁 Board Pack" button on the main card to view saved items.
+
+## Code Explanation
+
+### Core Architecture
+
+The Executive Intelligence application is built as a Next.js application with TypeScript, leveraging Perplexity's Sonar API for AI-powered intelligence generation. Here are the key code snippets and their explanations:
+
+#### 1. Perplexity API Integration
+
+```typescript
+// lib/perplexity.ts
+export async function askPerplexity(question: string) {
+  const res = await fetch('/api/perplexity', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: question }),
+  })
+  if (!res.ok) throw new Error('Perplexity API error')
+  return res.json()
+}
+```
+**How it works:** This is a simple wrapper function that forwards user queries to the Perplexity API endpoint. It handles the basic HTTP request/response cycle and error handling for API communication.
+
+#### 2. API Route Handler
+
+```typescript
+// app/api/perplexity/route.ts
+export async function POST(req: NextRequest) {
+  const { query } = await req.json()
+  const apiKey = process.env.PERPLEXITY_API_KEY
+  
+  const requestBody = {
+    model: 'sonar-pro',
+    messages: [
+      { role: 'system', content: 'Be precise and concise.' },
+      { role: 'user', content: query },
+    ],
+  }
+  
+  const res = await fetch('https://api.perplexity.ai/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'accept': 'application/json',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+    signal: controller.signal,
+    timeout: 30000, // 30 second timeout
+  })
+}
+```
+
+**How it works:** This API route handler:
+- Extracts the query from the request body
+- Validates the API key from environment variables
+- Constructs the proper request format for Perplexity's Sonar API
+- Implements timeout handling (30 seconds) to prevent hanging requests
+- Includes comprehensive error handling for network issues, timeouts, and API errors
+
+#### 3. Boardroom Memory Context
+
+```typescript
+// components/context/boardroom-memory.tsx
+export interface MemoryItem {
+  id: number;
+  title: string;
+  description: string;
+  timestamp: string;
+  type: 'board-pack' | 'brief' | 'alert';
+  actionItems?: string[];
+  references?: string[] | { [num: string]: string };
+}
+
+const BoardroomMemoryContext = createContext<BoardroomMemoryContextType | undefined>(undefined);
+
+export function BoardroomMemoryProvider({ children }: { children: ReactNode }) {
+  const [memory, setMemory] = useState<MemoryItem[]>(initialMemory);
+  const [pinnedId, setPinnedId] = useState<number | null>(null);
+  
+  // Add logging wrapper for setMemory
+  const wrappedSetMemory: React.Dispatch<React.SetStateAction<MemoryItem[]>> = (newState) => {
+    console.log('BoardroomMemoryProvider: setMemory called with:', newState);
+    // ... implementation
+  };
+}
+```
+
+**How it works:** This React Context provides persistent state management for:
+- Storing generated intelligence briefs, scenario analyses, and alerts
+- Maintaining a searchable knowledge base of board-ready insights
+- Supporting pinned items for quick access to critical information
+- Including comprehensive logging for debugging state changes
+
+#### 4. Competitive Intelligence Generation
+
+```typescript
+// components/CompetitiveThreatAlertCard.tsx
+const handleCompetitiveAnalysis = async () => {
+  setIsLoading(true);
+  try {
+    const prompt = `Generate a comprehensive competitive intelligence brief for ${company}. 
+    Include: Executive Summary, Recent High-Impact Competitor Moves, Market Shifts & Opportunities, 
+    and Board-Ready Recommendations. Format with clear sections and numbered references.`;
+    
+    const response = await askPerplexity(prompt);
+    const content = response.choices[0].message.content;
+    
+    // Parse the response into structured sections
+    const sections = parseMarkdownSections(content);
+    const references = extractReferences(content);
+    
+    setAnalysis({ sections, references, rawContent: content });
+  } catch (error) {
+    toast.error('Failed to generate competitive analysis');
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+**How it works:** This function:
+- Constructs detailed prompts for Perplexity API to generate competitive intelligence
+- Parses the AI response into structured sections (Executive Summary, Competitor Moves, etc.)
+- Extracts and formats references for proper citation linking
+- Handles loading states and error scenarios
+- Integrates with the boardroom memory system for persistence
+
+#### 5. Benchmark Board Component
+
+```typescript
+// components/BenchmarkBoard.tsx
+const generateBenchmark = async () => {
+  setIsLoading(true);
+  try {
+    const competitors = [company, ...selectedCompetitors].join(', ');
+    const prompt = `Create a visual benchmark comparison of ${competitors} across key metrics: 
+    ${selectedMetrics.join(', ')}. Include data visualization suggestions and source citations.`;
+    
+    const response = await askPerplexity(prompt);
+    const content = response.choices[0].message.content;
+    
+    // Extract reference links and format for display
+    const refMap = extractReferenceLinks(content);
+    const linkedContent = linkReferencesInMarkdown(content, refMap);
+    
+    setBenchmarkData({ content: linkedContent, references: refMap });
+  } catch (error) {
+    toast.error('Failed to generate benchmark');
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+**How it works:** This component:
+- Generates peer comparison benchmarks using Perplexity's analysis capabilities
+- Supports dynamic competitor selection and metric customization
+- Automatically links citations to their sources for verification
+- Provides visual data representation suggestions
+- Maintains source integrity for board-ready presentations
+
+#### 6. Markdown Processing & Citation Handling
+
+```typescript
+// Utility functions for processing AI responses
+function parseMarkdownSections(markdown: string) {
+  const sectionRegex = /^(###? .*)$/gm;
+  const matches: { match: string; index: number }[] = [];
+  let match;
+  while ((match = sectionRegex.exec(markdown)) !== null) {
+    matches.push({ match: match[1], index: match.index! });
+  }
+  
+  const sections = [];
+  for (let i = 0; i < matches.length; i++) {
+    const start = matches[i].index;
+    const end = i < matches.length - 1 ? matches[i + 1].index : markdown.length;
+    const title = matches[i].match.replace(/^#+\s*/, '');
+    const content = markdown.slice(start + matches[i].match.length, end).trim();
+    sections.push({ title, content });
+  }
+  return sections;
+}
+
+function postProcessCitations(markdown: string): string {
+  // Find the References section and add anchor tags
+  const refSectionMatch = markdown.match(/(### References[\s\S]*)/i);
+  let processed = markdown;
+  if (refSectionMatch) {
+    const refSection = refSectionMatch[1];
+    const refAnchored = refSection.replace(/^(\d+)\.?\s+/gm, (m, n) => `<a id='ref${n}'>${n}.</a> `);
+    processed = processed.replace(refSection, refAnchored);
+  }
+  // Replace citation markers with clickable links
+  processed = processed.replace(/\[(\d+)\](?!\()/g, (m, n) => `[${n}](#ref${n})`);
+  return processed;
+}
+```
+
+**How it works:** These utilities:
+- Parse AI-generated markdown into structured sections for better UI presentation
+- Automatically link citations to their corresponding references
+- Handle various citation formats ([1], [1,2], [1-3])
+- Create clickable reference links for source verification
+- Maintain document structure for professional board presentations
+
+#### 7. Scenario Planning Implementation
+
+```typescript
+const handleScenarioPlanning = async (scenario: string) => {
+  setIsLoading(true);
+  try {
+    const prompt = `Analyze this scenario for ${company}: "${scenario}". 
+    Provide: Risk Assessment, Opportunity Analysis, Strategic Recommendations, 
+    and Implementation Timeline. Include specific data points and citations.`;
+    
+    const response = await askPerplexity(prompt);
+    const content = response.choices[0].message.content;
+    
+    setScenarioAnalysis({ content, scenario });
+  } catch (error) {
+    toast.error('Failed to generate scenario analysis');
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+**How it works:** This function enables:
+- Dynamic scenario generation based on user-defined "what-if" questions
+- Structured analysis of risks, opportunities, and strategic implications
+- Time-based planning with implementation timelines
+- Data-driven recommendations with source citations
+- Integration with the boardroom memory for scenario tracking
+
+## Links
+
+- [GitHub Repository](https://github.com/raishs/perplexityhackathon)
+- [Live Demo](https://www.youtube.com/watch?v=SB1pxIl9Mp0)
+
+## Limitations
+
+1. **Memory Persistence**
+   - Boardroom memory is currently stored in React state (client-side only)
+   - Data is lost on page refresh or browser restart
+   - No database integration for permanent storage
+   - No user authentication or multi-user support
+
+2. **Scalability Constraints**
+   - Single-page application architecture may not scale for enterprise use
+   - No caching mechanisms for repeated queries
+   - Synchronous API calls can block UI during processing
+   - No background processing for long-running analyses
+   - 
+3. **Needs Access Control**
+   - No user authentication or authorization
+   - No role-based access controls
+   - No audit trails for intelligence generation
+   - No data encryption for sensitive information
+
+### Recommendations for Production Use
+
+1. **Implement proper data persistence** with a database backend
+2. **Add user authentication and authorization** for enterprise security
+3. **Integrate with additional data sources** for comprehensive intelligence
+4. **Implement caching mechanisms** to reduce API calls and improve performance
+5. **Add export functionality** for board presentations and reports
+6. **Develop offline capabilities** for critical intelligence access
+7. **Implement real-time notifications** for competitive alerts
+8. **Add collaborative features** for team-based intelligence gathering 
