@@ -1,0 +1,59 @@
+---
+title: Valetudo AI | Trusted Medical Answer Assistant  
+description: Sonar-powered medical assistant for fast, science-backed answers.
+sidebar_position: 6
+keywords: [medical, AI assistant, Perplexity Sonar]
+---
+
+# Valetudo AI
+
+**Valetudo AI** is a science-backed medical assistant powered by the Perplexity Sonar API. It provides fast, clear, and well-cited answers to health questions — helping users cut through misinformation with filters, image analysis, and ready-made prompt templates.
+
+Designed for conscious users — like parents, patients, and medical students — seeking reliable information.
+
+## Features
+
+- **Cited Answers** — sourced from a curated list of 10 trusted medical domains
+- **Smart Filters** — by date and country for localized, up-to-date insights
+- **Image Upload** — analyze photos of medication, conditions, or packaging
+- **Prompt Templates** — 7 categories for symptom checks, drug safety, research, and more
+- **Simple UI** — built with React and Tailwind CSS
+
+## How It Uses the Sonar API
+
+Valetudo AI integrates with [Perplexity Sonar Pro](https://docs.perplexity.ai), leveraging advanced features for domain-specific search and rich responses:
+
+| Feature               | API Field                          | Purpose                                            |
+|-----------------------|------------------------------------|----------------------------------------------------|
+| Context Control       | `search_context_size: medium`      | Balances speed and depth for focused medical Q&A   |
+| Trusted Domains       | `search_domain_filter`             | Restricts results to vetted health sources         |
+| Visual Input          | `image_url`                        | Enables image-based medical queries                |
+| Freshness Filter      | `search_after/before_date_filter`  | Helps surface recent and relevant findings         |
+| Local Relevance       | `user_location`                    | Tailors answers based on user’s region             |
+
+## Links
+
+- [GitHub Repository](https://github.com/vero-code/valetudo-ai)
+- [Devpost Submission](https://devpost.com/software/valetudo-ai)
+- [View All Screenshots](https://github.com/vero-code/valetudo-ai/tree/master/screenshots)
+
+## Demo Video
+
+See Valetudo AI in action:  
+[![Watch the demo](https://img.youtube.com/vi/AX3nOh9LbTc/0.jpg)](https://www.youtube.com/watch?v=AX3nOh9LbTc)
+
+## Screenshots
+
+### Home Interface
+<img src="https://github.com/vero-code/valetudo-ai/blob/master/screenshots/1-home.png" alt="Home screen" width="800" />
+
+### Prompt Templates
+<img src="https://github.com/vero-code/valetudo-ai/blob/master/screenshots/10-prompts.png" alt="Prompt templates" width="800" />
+
+### Image Upload
+<img src="https://github.com/vero-code/valetudo-ai/blob/master/screenshots/8-image-upload.png" alt="Image upload" width="800" />
+
+### Date & Location Filters
+<img src="https://github.com/vero-code/valetudo-ai/blob/master/screenshots/7-date-filter.png" alt="Date filter" width="800" />
+
+<img src="https://github.com/vero-code/valetudo-ai/blob/master/screenshots/9-location-filter.png" alt="Location filter" width="800" />
