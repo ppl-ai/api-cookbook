@@ -1,0 +1,78 @@
+---
+title: 4Point Hoops | AI Basketball Analytics & Insights  
+description: Advanced NBA analytics platform that combines live Basketball-Reference data with Perplexity Sonar to deliver deep-dive player stats, cross-season comparisons and expert-grade AI explanations.  
+sidebar_position: 2  
+keywords: [nba, basketball, analytics, ai, perplexity, sonar, sports-data, comparisons]  
+---
+
+# 4Point Hoops – AI-Powered NBA Analytics
+
+![4Point Hoops Dashboard](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/442/047/datas/original.png)
+
+4Point Hoops turns raw NBA statistics into **actionable, narrative-driven insights**. By scraping Basketball-Reference in real time, cleansing the data and routing context-rich prompts to Perplexity’s *sonar-pro* model, it lets fans, analysts and fantasy players *understand the “why” and “what’s next” – not just the numbers*.
+
+[![Demo Video](https://img.youtube.com/vi/lThCWq0ij7k/hqdefault.jpg)](https://youtu.be/lThCWq0ij7k)
+
+## What 4Point Hoops Does
+
+- **Player analytics** – season & playoff splits, shot-type breakdowns and performance radar for any NBA player  
+- **Cross-era comparisons** – e.g. *Michael Jordan ’97 vs. Stephen Curry ’22* side-by-side, stat-for-stat  
+- **Team dashboards** – standings, playoff-probability Sankey flows and KPI tiles that auto-refresh daily  
+- **AI Explain & Similar Players** – one-click Sonar explanations of a stat line or AI-picked comparable athletes  
+- **Basketball AI Chat** – ask an expert LLM anything about NBA history, rosters or projections  
+- **Credit-based SaaS plumbing** – Firebase Auth + Realtime DB manage sign-up, Google login, credit wallets, admin tooling and feedback inbox  
+
+![AI Explain Modal](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/442/042/datas/original.png)
+
+## How It Uses Perplexity Sonar
+
+```python
+# Inline “AI Explain” for a selected player/season
+payload = {
+    "model": "sonar-pro",
+    "messages": [
+        {
+            "role": "user",
+            "content": (
+                "Explain Giannis Antetokounmpo's 2021 playoff stats in plain English. "
+                "Highlight shooting efficiency and defensive impact."
+            )
+        }
+    ],
+    "response_format": {"type": "text"}
+}
+explanation = client.chat.completions.create(**payload)
+
+# Free-form chat endpoint
+chat = client.chat.completions.create(
+    model="sonar-pro",
+    messages=[
+        {"role": "system", "content": "You are an NBA analytics expert."},
+        {"role": "user", "content": "Who were the top 5 players in PER last season and why?"}
+    ]
+)
+```
+
+- **Context packing** – the backend injects cleaned, season-filtered DataFrames into the prompt so Sonar reasons over *actual* numbers.  
+- **Credit guard** – every AI call passes through `credit_required()` middleware that checks Firebase balance before deducting a point and logging the query.  
+
+## Tech Stack
+
+| Layer            | Tech                                         |
+|------------------|----------------------------------------------|
+| Frontend         | React + shadcn/ui, Recharts (Netlify deploy) |
+| Backend/API      | Python Flask (Hugging Face Spaces)           |
+| Data Pipeline    | BRScraper → cleanse → Firebase cache         |
+| Auth & Storage   | Firebase Auth + Realtime Database            |
+| AI Integration   | Perplexity Sonar-Pro, Pollinations TTS       |
+| DevOps           | Docker, GitHub Actions                       |
+
+## Links
+
+- **Frontend Repo** – <https://github.com/rapha18th/hoop-ai-frontend-44>  
+- **Backend Repo** – <https://github.com/rapha18th/4Point-Hoops-Server>  
+- **Live Demo** – <https://4pointhoops.netlify.app/>  
+- **Devpost Story** – <https://devpost.com/software/4point-hoops>  
+- **Video Walk-through** – <https://youtu.be/lThCWq0ij7k?si=TcLA6oP7nkhjHmjq>
+
+*Built with ❤️ by Rairo Mukamuri.*
