@@ -1,0 +1,48 @@
+---
+title: Perplexity FinCaseAI | AI-Powered Credit Dispute Reviewer
+description: A smart assistant that uses Perplexity's Sonar API to analyze financial dispute cases and suggest approve/reject decisions with reasoning.
+sidebar_position: 12
+keywords: [FinCaseAI, Perplexity, Sonar API, finance, disputes, fraud detection, sentiment analysis, LLM, AI]
+---
+
+**Perplexity FinCaseAI** is a lightweight, AI-powered tool that reviews credit card dispute complaints and assists analysts by suggesting decisions based on fraud patterns, urgency, and reasoning.
+
+## Features
+
+- Approve/Reject decision suggestions with confidence levels  
+- Fraud risk scoring using keyword and pattern matching  
+- Sentiment and urgency detection from complaint text  
+- Sonar API integration for final recommendations and reasoning  
+- Optional Redis-based caching for performance  
+
+## How It Uses Sonar
+
+FinCaseAI sends case descriptions as structured prompts to the **Sonar API**, asking for:
+
+- A decision recommendation (approve/reject)  
+- A brief explanation for the judgment  
+
+The API response is parsed and shown alongside internal fraud and sentiment scores for a complete picture.
+
+> **Example Prompt to Sonar**  
+> "_Given the following customer complaint, should the dispute be approved or rejected? Provide a short explanation._"
+
+## Tech Stack
+
+- **Frontend**: React + Vite  
+- **Backend**: Python Flask  
+- **AI Engine**: Perplexity Sonar API + custom logic  
+- **Cache**: Optional Redis integration  
+- **Infrastructure**: Runs locally or deployable via Docker  
+
+## Setup Instructions
+
+1. Clone the [GitHub repo](https://github.com/PrashansaChaudhary/Perplexity-FinCaseAI)  
+2. Create a `.env` file with your `SONAR_API_KEY`  
+3. Run the backend using Flask  
+4. Start the frontend using Vite  
+5. Open `http://localhost:5173` and start testing your cases  
+
+## Links
+
+- [GitHub Repository](https://github.com/PrashansaChaudhary/Perplexity-FinCaseAI)
