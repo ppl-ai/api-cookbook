@@ -1,0 +1,204 @@
+---
+title: Greenify | Localized community-driven greenification/plantation solution with AI
+description: Greenify is a mobile application designed to encourage and facilitate sustainable practices by analyzing live image and building community via Perplexity Sonar API.
+sidebar_position: 6
+keywords: [image processing, community, maps, expo, react native, flask, Perplexity, sonar]
+---
+
+# Greenify
+
+![Greenify](https://raw.githubusercontent.com/deepjyotipaulhere/greenify/master/assets/images/gallery.jpg)
+
+The inspiration for Greenify stems from the growing need to address environmental challenges and promote sustainable living. With the rise of urbanization and technology, we wanted to create a platform that merges innovation with eco-consciousness. Greenify aims to empower individuals and communities to take actionable steps toward a greener future by leveraging technology to make sustainability accessible and engaging.
+
+## Features
+
+Greenify is a mobile application designed to encourage and facilitate sustainable practices. It provides users with tools and resources to:
+
+- Participate in community-driven eco-friendly challenges and initiatives.
+- Access a curated library of tips, guides, and resources for sustainable living.
+- Connect with like-minded individuals through a community platform to share ideas and inspire action.
+
+The app is designed to be user-friendly, visually appealing, and impactful, making it easier for users to integrate sustainability into their daily lives.
+
+## Prerequisites
+
+- NodeJS 20.19.4 or later
+- Python 3.10.0 or later
+- Perplexity API key for Sonar integration
+- Expo (SDK version 51 or later) ([Setup guide](https://docs.expo.dev/))
+- Android SDK/studio set up for local build or simulator run ([Setup guide](https://developer.android.com/about/versions/14/setup-sdk))
+- Xcode installed if using Mac and for simulator run ([Setup guide](https://developer.apple.com/documentation/safari-developer-tools/installing-xcode-and-simulators))
+- An Android/iPhone device for image capture with camera
+
+## Installation
+
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). Also there is a ```/service``` folder in the root directory of the project which contains the Flask API for communicating between frontend and Perplexity API.
+
+1. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+2. Start the app
+
+   ```bash
+   npx expo start
+   ```
+
+In the output, you'll find options to open the app in a
+
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+
+3. In another terminal navigate to ```/service``` folder and install dependencies
+```bash
+pip install -r requirements.txt
+```
+4. Set ```PPLX_API_KEY``` in ```.env``` file inside the ```/service``` folder (create ```.env``` file if doesn't exist)
+4. Run Flask app
+```bash
+python app.py
+```
+5. To open app in mobile
+##### Option 1
+* Install Expo Go app from Play Store or App Store
+* Scan the QR code shown in the terminal
+
+##### Option 2
+Open web browser in your smartphone and navigate to the URL shown in the console.
+
+## Abstract Data Flow Diagram
+![Abstract Data Flow Diagram](https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/003/418/290/datas/gallery.jpg)
+
+
+## Usage
+
+After running the app in your own setup or through the hosted URL, the following steps can be followed:
+
+### First Step: Greenification
+
+|  |  |
+|------|-------------|
+| ![First Step](https://raw.githubusercontent.com/deepjyotipaulhere/greenify/refs/heads/master/assets/images/ezgif-4647c5467e6dac.gif) | <ul><li>The user opens the app, which requests permission to capture a photo and access the user's location.</li><li>The user takes a photo of their space (e.g., a balcony), and the app automatically captures their coordinates (latitude, longitude, and altitude).</li><li>The image is sent to the Perplexity <code>sonar-pro</code> model to analyze the environment (e.g., balcony, roadside), sunlight exposure, and available space for plants.</li><li>The resulting analysis and user coordinates are sent to the Perplexity <code>sonar-deep-research</code> model to get real-time weather information, assess plant growth suitability, and receive up to five plant suggestions.</li><li>The API returns an analysis of which plants are suitable based on the location type, sunlight, and whether it's an indoor or outdoor space.</li><li>The API also provides a list of suitable plants based on sunlight and average weather conditions for the location.</li><li>Finally, the user can share these plant suggestions with other users in the same locality.</li></ul> |
+
+### Second Step: Community Building
+
+|  |  |
+|-------------|------|
+| <ul><li>The community screen displays nearby users and the plant suggestions they received from the photos they uploaded.</li><li>The user clicks the “Start Matching” button to get AI-suggested matches with other users based on similar interests, plant suggestions, and the potential for sharing resources.</li><li>The API suggests community groups for matched users based on shared interests and recommended plants.</li><li>Each community group shows the matched users and an explanation for why they were matched.</li><li>The app also explains how the community can positively impact the local ecosystem and promote economic growth.</li></ul> | ![Second Step](https://raw.githubusercontent.com/deepjyotipaulhere/greenify/refs/heads/master/assets/images/ezgif-439e19e10fb6f4.gif) |
+
+## Code Explanation
+
+Greenify was built using the [Expo](https://expo.dev) framework, which allowed us to create a cross-platform application for Android, iOS, and the web. Key technologies and tools used include:
+
+- **Frontend**: React Native with Expo for building the user interface and ensuring a seamless user experience.
+- **Backend**: A Python-based service using Flask to handle data processing and API endpoints.
+- **Perplexity AI**: Using Perplexity AI's sonar-pro and sonar-deep-research models to classify image, plant suggestions based on image and coordinates by realtime research, creating a community by matching users of similar plant suggestions
+- **Design**: Using React Native UI Kitten for custom themes and assets, including fonts and icons, to create a visually cohesive and engaging interface.
+- **File-based routing**: Leveraging Expo's file-based routing system for intuitive navigation.
+- **Community features**: Implemented using React Native components and hooks for real-time interaction.
+
+** Pydantic models **
+```python 
+from pydantic import BaseModel, Field
+
+
+class Plant(BaseModel):
+    name: str
+    image: str = Field(description="Image URL of the plant")
+    description: str = Field(description="Description of the plant")
+    care_instructions: str = Field(description="Care instructions for the plant")
+    care_tips: str = Field(description="Care tips for the plant")
+    AR_model: str = Field(description="AR model URL for the plant")
+
+
+class Answer1(BaseModel):
+    description: str
+
+class Answer2(BaseModel):
+    plants: list[Plant]
+
+
+class Benefit(BaseModel):
+    type: str = Field(description="Type of the environmental benefit")
+    amount: str = Field(description="How much percentage of improvement")
+    direction: bool = Field(description="True means increasing, False means decreasing")
+
+
+class Group(BaseModel):
+    users: list[str] = Field(
+        description="List at least 2 or more users with similar plant suggestions and how they can combine same job in term of place, activities and plantation"
+    )
+    description: list[str] = Field(
+        description="Short description of how these people match with each other"
+    )
+    benefits: list[Benefit] = Field(
+        description="How this combination helps benefit the environment with parameter, percentage value"
+    )
+
+
+class Community(BaseModel):
+    match: list[Group]
+```
+
+** Image Analysis and Insights about the captured image using sonar-pro and structured JSON output **
+```python
+payload = {
+    "model": "sonar-pro",
+    "messages": [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Analyze this image and return short description of the place with respect to suitability of plant growth ",
+                },
+                {"type": "image_url", "image_url": {"url": image}},
+            ],
+        },
+    ],
+    "stream": False,
+    "response_format": {
+        "type": "json_schema",
+        "json_schema": {"schema": Answer1.model_json_schema()},
+    },
+}
+```
+
+** Matching people with similar plant suggestions and interests and create a matching community using sonar-deep-research **
+```python
+payload_research = {
+    "model": "sonar-deep-research",
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a plant growth expert. You are given a description of a place where an user want to grow some plants. You are also given latitude, longitude and altitude of the user. Your task is to suggest at most 5 plant that can be grown by the user in that particular place according to average weather.",
+        },
+        {
+            "role": "user",
+            "content": f"I am standing in a place having coordinates [{lat}, {lng}] and altitude {alt}]. The place can be described as follows: {answer1}"
+            "Suggest at most five suitable plants that can be grown here.",
+        },
+    ],
+    "stream": False,
+    "response_format": {
+        "type": "json_schema",
+        "json_schema": {"schema": Answer2.model_json_schema()},
+    },
+}
+```
+
+
+## Links
+
+- [GitHub Repository](https://github.com/deepjyotipaulhere/greenify)
+- [Live Demo](https://greenify.expo.app)
+
+![Live Demo URL](https://raw.githubusercontent.com/deepjyotipaulhere/greenify/refs/heads/master/assets/images/frame.png)
+- Youtube Demo
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/IFP0EiHqd7Y/0.jpg)](https://www.youtube.com/watch?v=IFP0EiHqd7Y)
