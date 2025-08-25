@@ -1,119 +1,181 @@
-# This code is a simplified example of a Discord bot that integrates with the Perplexity AI API. This is a complete, minimal bot script that someone can run directly. Notice I have simplified the permission logic to only check for administrators to remove the need for an external database, making the example much more focused on the Perplexity API.
-
-# bot.py
 import os
 import discord
 from discord.ext import commands
 from discord import app_commands
 import openai
 from dotenv import load_dotenv
+import logging
+import re
 
-# --- Step 1: Load Environment Variables ---
-# This ensures your secret keys are kept safe in a .env file.
+# Basic logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Load environment variables
 load_dotenv()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
 
-# --- Step 2: Bot Setup ---
-# We define the bot's intents, which tell Discord what events our bot needs to receive.
+# Bot setup
 intents = discord.Intents.default()
+intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# --- Step 3: Create a Command Cog ---
-# Cogs are how modern discord.py bots organize commands, listeners, and state.
-class AIChatCog(commands.Cog):
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
+# Perplexity client
+perplexity_client = openai.OpenAI(
+    api_key=PERPLEXITY_API_KEY,
+    base_url="https://api.perplexity.ai"
+) if PERPLEXITY_API_KEY else None
 
-        # Initialize the Perplexity AI Client using the key from our .env file.
-        # The `base_url` is the crucial part that directs the OpenAI library to Perplexity's API.
-        if PERPLEXITY_API_KEY:
-            self.perplexity_client = openai.OpenAI(
-                api_key=PERPLEXITY_API_KEY,
-                base_url="https://api.perplexity.ai"
-            )
-            print("Perplexity AI Client Initialized.")
-        else:
-            self.perplexity_client = None
-            print("CRITICAL: PERPLEXITY_API_KEY not found in .env file.")
-
-    # Define the slash command. 
-    # The `has_permissions` check restricts this command to server administrators.
-    @app_commands.command(name="ask_perplexity", description="Ask a question to Perplexity AI (with web access).")
-    @app_commands.describe(prompt="The question you want to ask.")
-    @app_commands.checks.has_permissions(administrator=True)
-    async def ask_perplexity(self, interaction: discord.Interaction, prompt: str):
-        if not self.perplexity_client:
-            return await interaction.response.send_message(
-                "The Perplexity AI service is not configured on this bot.", 
-                ephemeral=True
-            )
-
-        # Defer the response to give the API time to process without a timeout.
-        await interaction.response.defer(thinking=True)
-        
-        try:
-            # Create the list of messages for the API call, following the standard format.
-            messages = [{"role": "user", "content": prompt}]
-            
-            # Call the Perplexity API with the desired model.
-            response = self.perplexity_client.chat.completions.create(
-                model="sonar-pro", 
-                messages=messages
-            )
-            
-            answer = response.choices[0].message.content
-
-            # Create and send a nicely formatted Discord embed for the response.
-            embed = discord.Embed(
-                title="🌐 Perplexity's Response", 
-                description=answer, 
-                color=discord.Color.from_rgb(0, 255, 0) # Perplexity Green
-            )
-            embed.set_footer(text=f"Requested by {interaction.user.display_name}")
-            
-            # Truncate the original prompt if it's too long to fit in an embed field.
-            truncated_prompt = (prompt[:1020] + '...') if len(prompt) > 1024 else prompt
-            embed.add_field(name="Your Prompt", value=f"```{truncated_prompt}```", inline=False)
-            
-            await interaction.followup.send(embed=embed)
-            
-        except Exception as e:
-            # Inform the user if an error occurs.
-            error_message = f"An error occurred with the Perplexity API: {e}"
-            print(error_message)
-            await interaction.followup.send(error_message, ephemeral=True)
-
-    # A local error handler specifically for this command's permission check.
-    @ask_perplexity.error
-    async def on_ask_perplexity_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
-        if isinstance(error, app_commands.MissingPermissions):
-            await interaction.response.send_message("You must be an administrator to use this command.", ephemeral=True)
-        else:
-            # For other errors, print them to the console.
-            print(f"An unhandled error occurred: {error}")
-            # Potentially send a generic error message back to the user as well.
-            if not interaction.response.is_done():
-                await interaction.response.send_message("An unexpected error occurred.", ephemeral=True)
-
-
-# --- Step 4: Main Bot Events and Startup Logic ---
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}!')
-    try:
-        # Add the cog to the bot so its commands are registered.
-        await bot.add_cog(AIChatCog(bot))
-        
-        # Sync the slash commands to Discord. This makes them appear for users.
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} command(s).")
-    except Exception as e:
-        print(f"Error during setup: {e}")
+    """Bot startup"""
+    logger.info(f"Bot {bot.user} is ready!")
+    await bot.tree.sync()
+    logger.info("Commands synced")
 
-# This is the entry point for running the bot.
+@bot.tree.command(name="ask", description="Ask Perplexity AI a question")
+@app_commands.describe(question="Your question")
+async def ask(interaction: discord.Interaction, question: str):
+    """Ask Perplexity AI a question"""
+    if not perplexity_client:
+        await interaction.response.send_message("❌ Perplexity AI not configured", ephemeral=True)
+        return
+
+    await interaction.response.defer()
+    
+    try:
+        response = perplexity_client.chat.completions.create(
+            model="sonar-pro",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "You are a helpful AI assistant. Provide clear, accurate answers with citations."
+                },
+                {"role": "user", "content": question}
+            ],
+            max_tokens=2000,
+            temperature=0.2
+        )
+        
+        answer = response.choices[0].message.content
+        formatted_answer = format_citations(answer, response)
+        
+        # Truncate if too long
+        if len(formatted_answer) > 2000:
+            formatted_answer = formatted_answer[:1997] + "..."
+        
+        await interaction.followup.send(formatted_answer)
+        
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        await interaction.followup.send("❌ Sorry, an error occurred. Please try again.", ephemeral=True)
+
+@bot.event
+async def on_message(message):
+    """Handle mentions"""
+    if message.author == bot.user or message.author.bot:
+        return
+    
+    # Check if bot is mentioned
+    if bot.user in message.mentions and perplexity_client:
+        # Remove mention from content
+        content = message.content.replace(f'<@{bot.user.id}>', '').replace(f'<@!{bot.user.id}>', '').strip()
+        
+        if not content:
+            await message.reply("Hello! Ask me any question.")
+            return
+        
+        async with message.channel.typing():
+            try:
+                response = perplexity_client.chat.completions.create(
+                    model="sonar-pro",
+                    messages=[
+                        {
+                            "role": "system", 
+                            "content": "You are a helpful AI assistant. Provide clear, accurate answers with citations."
+                        },
+                        {"role": "user", "content": content}
+                    ],
+                    max_tokens=2000,
+                    temperature=0.2
+                )
+                
+                answer = response.choices[0].message.content
+                formatted_answer = format_citations(answer, response)
+                
+                # Truncate if too long
+                if len(formatted_answer) > 2000:
+                    formatted_answer = formatted_answer[:1997] + "..."
+                
+                await message.reply(formatted_answer)
+                
+            except Exception as e:
+                logger.error(f"Error: {e}")
+                await message.reply("❌ Sorry, an error occurred. Please try again.")
+    
+    await bot.process_commands(message)
+
+def format_citations(text: str, response_obj) -> str:
+    """Simple citation formatting that actually works"""
+    # Get search results from response
+    search_results = []
+    
+    if hasattr(response_obj, 'search_results') and response_obj.search_results:
+        search_results = response_obj.search_results
+    elif hasattr(response_obj, 'model_dump'):
+        dumped = response_obj.model_dump()
+        search_results = dumped.get('search_results', [])
+    
+    if not search_results:
+        return text
+    
+    # Find existing citations like [1], [2], etc.
+    citation_pattern = r'\[(\d+)\]'
+    citations = re.findall(citation_pattern, text)
+    
+    if citations:
+        # Replace existing citations with clickable links
+        def replace_citation(match):
+            num = int(match.group(1))
+            idx = num - 1
+            
+            if 0 <= idx < len(search_results):
+                result = search_results[idx]
+                
+                # Extract URL from search result
+                url = ""
+                if isinstance(result, dict):
+                    url = result.get('url', '')
+                elif hasattr(result, 'url'):
+                    url = result.url
+                
+                if url:
+                    return f"[[{num}]](<{url}>)"
+            
+            return f"[{num}]"
+        
+        text = re.sub(citation_pattern, replace_citation, text)
+    else:
+        # No citations in text, add them at the end
+        citations_list = []
+        for i, result in enumerate(search_results[:5]):  # Limit to 5
+            url = ""
+            if isinstance(result, dict):
+                url = result.get('url', '')
+            elif hasattr(result, 'url'):
+                url = result.url
+            
+            if url:
+                citations_list.append(f"[[{i+1}]](<{url}>)")
+        
+        if citations_list:
+            text += "\n\n**Sources:** " + " ".join(citations_list)
+    
+    return text
+
 if __name__ == "__main__":
     if not DISCORD_TOKEN or not PERPLEXITY_API_KEY:
-        print("CRITICAL: DISCORD_TOKEN and/or PERPLEXITY_API_KEY not found in .env file. Bot cannot start.")
+        print("❌ Missing DISCORD_TOKEN or PERPLEXITY_API_KEY in .env file")
     else:
         bot.run(DISCORD_TOKEN)

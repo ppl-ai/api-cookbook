@@ -1,104 +1,156 @@
 ---
 title: Perplexity Discord Bot
-description: A runnable discord.py bot that adds a /ask_perplexity command to your server, using the Sonar API for web-connected answers.
+description: A simple discord.py bot that integrates Perplexity's Sonar API to bring AI answers to your Discord server.
 sidebar_position: 4
 keywords: [discord, bot, discord.py, python, chatbot, perplexity, sonar api, command, slash command]
 ---
 
-# Perplexity Discord Bot
+A simple `discord.py` bot that integrates [Perplexity's Sonar API](https://docs.perplexity.ai/) into your Discord server. Ask questions and get AI-powered answers with web access through slash commands or by mentioning the bot.
 
-A runnable `discord.py` application that adds a `/ask_perplexity` slash command to your Discord server, using Perplexity's Sonar API for real-time, web-connected answers.
+![Discord Bot Demo](../../static/img/discord-py-bot-demo.png)
 
-## 🌟 Features
+## ✨ Features
 
-- **Direct Sonar API Integration**: Uses Perplexity's API for real-time, web-connected answers.
-- **Slash Command Ready**: Implements a modern `/ask_perplexity` command that's easy to use.
-- **Secure Configuration**: Uses environment variables (`.env`) for both Discord and Perplexity keys, keeping them safe.
-- **Administrator Permissions**: Locked to server administrators by default for easy control over API usage.
-- **Formatted Embeds**: Delivers answers in a clean, professional Discord embed.
-- **Self-Contained Example**: Minimal, single-file code designed to be easy to run and understand.
+- **🌐 Web-Connected AI**: Uses Perplexity's Sonar API for up-to-date information
+- **⚡ Slash Command**: Simple `/ask` command for questions  
+- **💬 Mention Support**: Ask questions by mentioning the bot
+- **🔗 Source Citations**: Automatically formats and links to sources
+- **🔒 Secure Setup**: Environment-based configuration for API keys
 
-## 📋 Prerequisites
+## 🛠️ Prerequisites
 
-- **Python 3.8+**
-- **A Perplexity API Key**
-- **A Discord Bot Token**
-
-## 🚀 Installation & Setup
-
-1.  **Clone the Repository:** Fork and clone the `api-cookbook` repository to your local machine.
-
-2.  **Navigate to this Example:**
+<Steps>
+  <Step title="Python Environment">
+    **Python 3.8+** installed on your system
+    
     ```bash
-    cd docs/examples/discord-py-bot/
+    python --version  # Should be 3.8 or higher
     ```
-3.  **Install Dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-4.  **Get Your Secret Keys:**
-    -   **Perplexity API Key:** Get your key from the [Perplexity AI Account Settings](https://www.perplexity.ai/settings/api).
-    -   **Discord Bot Token:** 
-        1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
-        2. Click **"New Application"** and give it a name.
-        3. Go to the **"Bot"** tab and click **"Reset Token"** (or "Add Bot" first if needed).
-        4. Copy the token. This is your bot's password – keep it safe!
+  </Step>
+  
+  <Step title="Perplexity API Access">
+    **Active Perplexity API Key** from [Perplexity AI Settings](https://www.perplexity.ai/settings/api)
+    
+    <Note>You'll need a paid Perplexity account to access the API. See the [pricing page](https://www.perplexity.ai/pricing) for current rates.</Note>
+  </Step>
+  
+  <Step title="Discord Bot Application">
+    **Discord Bot Token** from the [Discord Developer Portal](https://discord.com/developers/applications)
+  </Step>
+</Steps>
 
-5.  **Set Up Your Environment File:**
-    -   Rename the `.env.example` file to `.env`.
-    -   Open the `.env` file and add your secret keys:
-      ```
-      DISCORD_TOKEN="YOUR_DISCORD_BOT_TOKEN_HERE"
-      PERPLEXITY_API_KEY="YOUR_PPLX_API_KEY_HERE"
-      ```
+## 🚀 Quick Start
 
-## 🔧 Usage
+### 1. Repository Setup
 
-### 1. Invite Your Bot to a Server
+Clone the repository and navigate to the bot directory:
 
--   In the Discord Developer Portal, go to "OAuth2" -> "URL Generator".
--   Select the `bot` and `applications.commands` scopes.
--   Under "Bot Permissions," select **Administrator**.
--   Copy the generated URL, paste it into your browser, and invite the bot to your server.
-
-### 2. Run the Bot Script
-
-Simply execute the `bot.py` script from your terminal:
 ```bash
-python bot.py
-This will connect the bot to Discord and sync the /ask_perplexity command.
-3. Use the Command in Discord
-In any channel in your server, an administrator can type:
-code
-Code
-/ask_perplexity prompt:What is the latest news in the world of generative AI?
-📄 Output Example
-The bot will defer the interaction and then respond with a formatted embed containing the answer:
-code
-Code
-HatchMate [APP]
-🌐 Perplexity's Response
+git clone https://github.com/perplexity-ai/api-cookbook.git
+cd api-cookbook/docs/examples/discord-py-bot/
+```
 
-The latest news in generative AI includes advancements in large language models... (and so on).
+### 2. Install Dependencies
 
-Your Prompt```
-What is the latest news in the world of generative AI?
-Requested by YourUsername
-code
-Code
-## 🛠️ Extending the Bot
+```bash
+# Create a virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-- **Role-Based Access**: Modify the permission checks to allow specific roles, not just administrators.
-- **Model Selection**: Add an option to the slash command to choose between different models like `sonar-pro` or `sonar-small-online`.
-- **Conversation History**: Implement a database (like SQLite or Redis) to store recent messages and send them with new prompts for conversational context.
+# Install required packages
+pip install -r requirements.txt
+```
 
-## ⚠️ Limitations
+### 3. Configure API Keys
 
-- The permission system is basic (administrator-only) to keep the example simple and database-free.
-- The command is single-turn and does not remember conversation history.
-- API rate limits may apply based on your Perplexity account status.
+<Steps>
+  <Step title="Get Your Perplexity API Key">
+    1. Visit [Perplexity AI Account Settings](https://www.perplexity.ai/settings/api)
+    2. Generate a new API key
+    3. Copy the key to the .env file
+    
+    <Warning>Keep your API key secure! Never commit it to version control or share it publicly.</Warning>
+  </Step>
+  
+  <Step title="Create Discord Bot Application">
+    1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+    2. Click **"New Application"** and give it a descriptive name
+    3. Navigate to the **"Bot"** section
+    4. Click **"Reset Token"** (or "Add Bot" if first time)
+    5. Copy the bot token
+  </Step>
+  
+  <Step title="Configure Environment Variables">
+    Copy the example environment file and add your keys:
+    
+    ```bash
+    cp env.example .env
+    ```
+    
+    Edit `.env` with your credentials:
+    
+    ```bash title=".env"
+    DISCORD_TOKEN="your_discord_bot_token_here"
+    PERPLEXITY_API_KEY="your_perplexity_api_key_here"
+    ```
+  </Step>
+</Steps>
 
-## 🙏 Acknowledgements
+## 🎯 Usage Guide
 
-- This project uses the [Perplexity AI API](https://docs.perplexity.ai/).
-- Built with the [discord.py](https://discordpy.readthedocs.io/en/stable/) library.
+### Bot Invitation & Setup
+
+<Steps>
+  <Step title="Generate Invite URL">
+    In the Discord Developer Portal:
+    1. Go to **OAuth2** → **URL Generator**
+    2. Select scopes: `bot` and `applications.commands`
+    3. Select bot permissions: `Send Messages`, `Use Slash Commands`
+    4. Copy the generated URL
+  </Step>
+  
+  <Step title="Invite to Server">
+    1. Paste the URL in your browser
+    2. Select the Discord server to add the bot to
+    3. Confirm the permissions
+  </Step>
+  
+  <Step title="Start the Bot">
+    ```bash
+    python bot.py
+    ```
+    
+    You should see output confirming the bot is online and commands are synced.
+  </Step>
+</Steps>
+
+### How to Use
+
+**Slash Command:**
+```
+/ask [your question here]
+```
+
+![Slash Command Demo](../../static/img/discord-py-bot-slash-command.png)
+
+**Mention the Bot:**
+```
+@YourBot [your question here]
+```
+
+![Mention Command Demo](../../static/img/discord-py-bot-mention-command.png)
+
+## 📊 Response Format
+
+The bot provides clean, readable responses with:
+- **AI Answer**: Direct response from Perplexity's Sonar API
+- **Source Citations**: Clickable links to sources (when available)
+- **Automatic Truncation**: Responses are trimmed to fit Discord's limits
+
+## 🔧 Technical Details
+
+This bot uses:
+- **Model**: Perplexity's `sonar-pro` model
+- **Response Limit**: 2000 tokens from API, truncated to fit Discord
+- **Temperature**: 0.2 for consistent, factual responses
+- **No Permissions**: Anyone in the server can use the bot

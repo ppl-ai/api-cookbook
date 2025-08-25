@@ -1,0 +1,9 @@
+*.mdx linguist-documentation=false linguist-detectable=true
+*.md linguist-documentation=false linguist-detectable=true
+*.py linguist-detectable=true
+*.js linguist-detectable=true
+*.json linguist-detectable=false
+package-lock.json linguist-generated=true
+package.json linguist-generated=true
+
+scripts/ linguist-detectable=false
